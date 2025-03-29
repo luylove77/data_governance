@@ -7,20 +7,22 @@ import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 public class CodeGen3531 {
 
     public static void main(String[] args) {
 
-        String[] tables={  "dp_naming_rule"  };
+        String[] tables={  "dp_data_warehouse_model"  };
 
         FastAutoGenerator.create("jdbc:mysql://hadoop100:3306/dwm","root","root")
                 .globalConfig(builder -> {
                     builder.author("luyang")               //作者
-                            .outputDir("F:\\code\\bigdata\\data_governance\\src\\main\\java")    //输出路径(写到java目录),绝对路径
+                            .outputDir("F:\\code\\bigdata\\data_governance\\src\\main\\java")
                             .commentDate("yyyy-MM-dd")
                             .dateType(DateType.ONLY_DATE);  //选择实体类中的日期类型  ，Date or LocalDatetime
+
                 })
                 .packageConfig(builder -> {                 //各个package 名称
                     builder.parent("com.luy.dwm")
@@ -29,7 +31,8 @@ public class CodeGen3531 {
                             .service("service")
                             .serviceImpl("service.impl")
                             .controller("controller")
-                            .mapper("mapper");
+                            .mapper("mapper")
+                            ;
 
                 })
                 .strategyConfig(builder -> {
