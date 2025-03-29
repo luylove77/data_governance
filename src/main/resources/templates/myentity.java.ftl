@@ -1,7 +1,11 @@
 package ${package.Entity};
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * ${table.comment}
@@ -10,9 +14,16 @@ import java.io.Serializable;
  * @since ${date}
  */
 @Data
-public class ${entity}  {
+@TableName("${table.name}")
+public class ${entity} implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
 <#list table.fields as field>
+    <#if field.isPrimaryKey>
+    @TableId(value = "${field.name}", type = IdType.AUTO)
+    </#if>
+
     /**
      * ${field.comment}
      */
