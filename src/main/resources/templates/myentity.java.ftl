@@ -20,9 +20,7 @@ public class ${entity} implements Serializable {
     private static final long serialVersionUID = 1L;
 
 <#list table.fields as field>
-    <#if field.isPrimaryKey>
-    @TableId(value = "${field.name}", type = IdType.AUTO)
-    </#if>
+
 
     /**
      * ${field.comment}

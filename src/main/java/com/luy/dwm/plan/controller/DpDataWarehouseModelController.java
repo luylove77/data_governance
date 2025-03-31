@@ -50,7 +50,7 @@ public class DpDataWarehouseModelController {
     @GetMapping("/options")
     public Result getOptions(){
         QueryWrapper<DpDataWarehouseModel> queryWrapper = new QueryWrapper<DpDataWarehouseModel>().eq("is_deleted", "0")
-                .select("id", "model_name as name", "schema_name as nameEng");
+                .select("id", "model_name as name", "schema_name as schemaName");
         List<Map<String, Object>> mapList = dpDataWarehouseModelService.listMaps(queryWrapper);
         return Result.ok(mapList);
     }
