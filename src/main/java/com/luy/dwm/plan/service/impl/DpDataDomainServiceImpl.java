@@ -7,6 +7,8 @@ import com.luy.dwm.plan.service.DpDataDomainService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * æ•°æ�®åŸŸ 服务实现类
@@ -18,5 +20,14 @@ import org.springframework.stereotype.Service;
 @Service
 @DS("db1")
 public class DpDataDomainServiceImpl extends ServiceImpl<DpDataDomainMapper, DpDataDomain> implements DpDataDomainService {
+    public List<DpDataDomain> getDomainList(Long modelId){
+        String condition = "";
+        if(modelId != null){
+            condition = "and t.model_id = "+modelId;
+        }
 
+        List<DpDataDomain> dpDataDomains = this.baseMapper.selectDomainList(condition);
+        return dpDataDomains;
+
+    }
 }

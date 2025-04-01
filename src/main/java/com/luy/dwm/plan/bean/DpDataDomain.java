@@ -1,6 +1,7 @@
 package com.luy.dwm.plan.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -35,5 +36,8 @@ public class DpDataDomain implements Serializable {
     private Date lastUpdateTime;
 
     private String isDeleted;
+
+    @TableField(exist = false)
+    private String modelName;
 
 }
