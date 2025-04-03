@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -47,6 +48,19 @@ public class DpDataDomainController {
         List<DpDataDomain> domainList = dpDataDomainService.getDomainList(modelId);
 
         return Result.ok(domainList);
+    }
+
+    @GetMapping("/detail/{id}")
+    public Result getDetail(@PathVariable("id") Long id) {
+        return Result.ok(dpDataDomainService.getById(id));
+    }
+
+    @GetMapping("/options")
+    public Result getOptions(){
+        QueryWrapper<DpDataDomain> queryWrapper = new QueryWrapper<DpDataDomain>().eq("is_deleted", "0")
+                .select("id", "name_chn as name", "name_eng as nameEng");
+        List<Map<String, Object>> mapList = dpDataDomainService.listMaps(queryWrapper);
+        return Result.ok(mapList);
     }
 
 }
