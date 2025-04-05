@@ -1,7 +1,6 @@
-package com.luy.dwm.plan.bean;
+package com.luy.dwm.model.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -9,14 +8,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * ä¸šåŠ¡è¿‡ç¨‹
+ * ç»´åº¦
  *
  * @author luyang
- * @since 2025-04-01
+ * @since 2025-04-05
  */
 @Data
-@TableName("dp_busi_process")
-public class DpBusiProcess implements Serializable {
+@TableName("dm_dimension")
+public class DmDimension implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,18 +24,11 @@ public class DpBusiProcess implements Serializable {
     /**
      * ä¸»é”®
      */
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
 
     /**
-     * æ•°æ�®åŸŸid
-     */
-    private Long domainId;
-
-
-    /**
-     * æ•°ä»“æ¨¡åž‹id
+     * æ¨¡åž‹id
      */
     private Long modelId;
 
@@ -75,11 +67,5 @@ public class DpBusiProcess implements Serializable {
      * æ˜¯å�¦åˆ é™¤
      */
     private String isDeleted;
-
-    @TableField(exist = false)
-    private String modelName;
-
-    @TableField(exist = false)
-    private String domainName;
 
 }

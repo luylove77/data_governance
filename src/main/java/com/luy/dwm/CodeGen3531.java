@@ -14,7 +14,7 @@ public class CodeGen3531 {
 
     public static void main(String[] args) {
 
-        String[] tables={  "dp_busi_process"  };
+        String[] tables={  "dm_dimension"  };
 
         FastAutoGenerator.create("jdbc:mysql://hadoop100:3306/dwm","root","root")
                 .globalConfig(builder -> {
@@ -26,7 +26,7 @@ public class CodeGen3531 {
                 })
                 .packageConfig(builder -> {                 //各个package 名称
                     builder.parent("com.luy.dwm")
-                            .moduleName("plan")
+                            .moduleName("model")
                             .entity("bean")
                             .service("service")
                             .serviceImpl("service.impl")
@@ -59,7 +59,8 @@ public class CodeGen3531 {
                     public void accept(TemplateConfig.Builder builder) {
                         // 实体类使用我们自定义模板
                         builder.entity("templates/myentity.java");
-
+                        builder.mapper("templates/mymapper.java");
+                        builder.serviceImpl("templates/myserviceimpl.java");
                     }
                 })
                 .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板

@@ -21,8 +21,9 @@ import java.util.List;
 @DS("db1")
 public interface DpBusiProcessMapper extends BaseMapper<DpBusiProcess> {
 
-    @Select("select t.*,dw.model_name from dp_busi_process t\n" +
+    @Select("select t.*,dw.model_name,dd.name_chn as domain_name from dp_busi_process t\n" +
             " left join dp_data_warehouse_model dw on t.model_id = dw.id\n" +
+            " left join dp_data_domain dd on t.domain_id = dd.id\n" +
             "where t.is_deleted = '0' ${condition}")
     List<DpBusiProcess> selectBusiProcessList(String condition);
 
