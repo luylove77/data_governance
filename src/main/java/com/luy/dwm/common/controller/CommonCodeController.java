@@ -25,7 +25,7 @@ public class CommonCodeController {
     @GetMapping("/options")
     public Result getOptions(@RequestParam("pCode") String parentCode){
         QueryWrapper<CommonCode> queryWrapper = new QueryWrapper<CommonCode>()
-                .select("code_no as id","code_name as name")
+                .select("code_no as id","code_name as name","ext_name as extName")
                 .eq("parent_code_no",parentCode)
                 .eq("is_deleted","0");
         //commonCodeService.list(queryWrapper) 会返回javabean

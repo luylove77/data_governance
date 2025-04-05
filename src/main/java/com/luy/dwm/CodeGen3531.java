@@ -14,7 +14,7 @@ public class CodeGen3531 {
 
     public static void main(String[] args) {
 
-        String[] tables={  "dm_dimension"  };
+        String[] tables={  "dm_table","dm_table_column"  };
 
         FastAutoGenerator.create("jdbc:mysql://hadoop100:3306/dwm","root","root")
                 .globalConfig(builder -> {
