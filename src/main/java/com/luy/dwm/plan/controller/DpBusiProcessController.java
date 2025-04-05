@@ -55,8 +55,9 @@ public class DpBusiProcessController {
     }
 
     @GetMapping("/options")
-    public Result getOptions(){
+    public Result getOptions(@RequestParam(value = "modelId",required = false) Long modelId){
         QueryWrapper<DpBusiProcess> queryWrapper = new QueryWrapper<DpBusiProcess>().eq("is_deleted", "0")
+                .eq(modelId != null, "model_id", modelId)
                 .select("id", "name_chn as name", "name_eng as nameEng");
         List<Map<String, Object>> mapList = dpBusiProcessService.listMaps(queryWrapper);
         return Result.ok(mapList);

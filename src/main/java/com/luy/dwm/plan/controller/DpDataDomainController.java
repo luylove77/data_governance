@@ -56,8 +56,9 @@ public class DpDataDomainController {
     }
 
     @GetMapping("/options")
-    public Result getOptions(){
+    public Result getOptions(@RequestParam(value = "modelId",required = false) Long modelId){
         QueryWrapper<DpDataDomain> queryWrapper = new QueryWrapper<DpDataDomain>().eq("is_deleted", "0")
+                .eq(modelId != null, "model_id", modelId)
                 .select("id", "name_chn as name", "name_eng as nameEng");
         List<Map<String, Object>> mapList = dpDataDomainService.listMaps(queryWrapper);
         return Result.ok(mapList);
