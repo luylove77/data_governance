@@ -1,8 +1,10 @@
 package com.luy.dwm.model.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.luy.dwm.common.util.ArrayTypeHandler;
 import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
@@ -55,7 +57,10 @@ public class DmTable implements Serializable {
     /**
      * ç»Ÿè®¡ç²’åº¦(nä¸ªç»´åº¦)
      */
-    private String statDimIds;
+
+    //自定类类型转换，将Long[]类型转换为String类型
+    @TableField(typeHandler = ArrayTypeHandler.class)
+    private Long[] statDimIds;
 
 
     /**

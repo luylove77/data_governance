@@ -1,7 +1,18 @@
 package com.luy.dwm.model.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.luy.dwm.common.bean.QueryInfo;
+import com.luy.dwm.common.bean.Result;
+import com.luy.dwm.model.bean.DmDimension;
+import com.luy.dwm.model.bean.DmTable;
+import com.luy.dwm.model.service.DmDimensionService;
+import com.luy.dwm.model.service.DmTableService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -12,7 +23,45 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2025-04-05
  */
 @RestController
-@RequestMapping("/model/dmTable")
+@RequestMapping("/data-model/table")
 public class DmTableController {
+
+    @Autowired
+    DmTableService dmTableService;
+
+    @PostMapping("/detail")
+    public Result save(@RequestBody DmTable dmTable){
+        dmTable.setLastUpdateTime(new Date());
+        dmTable.setLastUpdateUserId(9999L);
+        dmTableService.saveOrUpdate(dmTable);
+
+        return Result.ok(dmTable);
+    }
+
+//    @GetMapping("/list")
+//    public Result getList(QueryInfo queryInfo) {
+//
+//
+//        List<DmDimension> list = dmDimensionService.getQueryList(queryInfo);
+//        Integer total = dmDimensionService.getQueryTotal(queryInfo);
+//
+//        //Result专门有封装返回两个参数的
+//        return Result.ok(list, total);
+//    }
+//
+//    @GetMapping("/detail/{id}")
+//    public Result getDetail(@PathVariable("id") Long id) {
+//        return Result.ok(dmDimensionService.getById(id));
+//    }
+//
+//    @GetMapping("/options")
+//    public Result getOptions(@RequestParam(value = "modelId",required = false) Long modelId){
+//        QueryWrapper<DmDimension> queryWrapper = new QueryWrapper<DmDimension>().eq("is_deleted", "0")
+//                .eq(modelId != null, "model_id", modelId)
+//                .select("id", "name_chn as name", "name_eng as nameEng");
+//        List<Map<String, Object>> mapList = dmDimensionService.listMaps(queryWrapper);
+//        return Result.ok(mapList);
+//    }
+
 
 }
