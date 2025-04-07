@@ -20,4 +20,6 @@ public interface DmTableService extends IService<DmTable> {
     List<DmTable> getQueryList(QueryInfo queryInfo);
 
     Integer getQueryTotal(QueryInfo queryInfo);
+
+    DmTable getTableAll(Long id);
 }

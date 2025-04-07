@@ -49,11 +49,12 @@ public class DmTableController {
         //Result专门有封装返回两个参数的
         return Result.ok(list, total);
     }
-//
-//    @GetMapping("/detail/{id}")
-//    public Result getDetail(@PathVariable("id") Long id) {
-//        return Result.ok(dmDimensionService.getById(id));
-//    }
+
+    @GetMapping("/detail/{id}")
+    public Result getDetail(@PathVariable("id") Long id) {
+        DmTable dmTable = dmTableService.getTableAll(id);
+        return Result.ok(dmTable);
+    }
 //
 //    @GetMapping("/options")
 //    public Result getOptions(@RequestParam(value = "modelId",required = false) Long modelId){

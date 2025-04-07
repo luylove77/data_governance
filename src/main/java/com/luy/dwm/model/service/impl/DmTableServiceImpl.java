@@ -1,5 +1,6 @@
 package com.luy.dwm.model.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.luy.dwm.common.bean.QueryInfo;
 import com.luy.dwm.common.bean.Result;
 import com.luy.dwm.common.util.SqlUtil;
@@ -93,5 +94,26 @@ public class DmTableServiceImpl extends ServiceImpl<DmTableMapper, DmTable> impl
         Integer total = this.baseMapper.selectCount(condition);
 
         return total;
+    }
+
+    @Override
+    public DmTable getTableAll(Long id) {
+        DmTable dmTable = this.getById(id);
+        List<DmTableColumn> tableColumns = dmTableColumnService.list(new QueryWrapper<DmTableColumn>()
+                .eq("is_deleted", "0")
+                .eq("table_id", id)
+                .eq("is_partition_col", "0")
+                .orderByAsc("seq"));
+        dmTable.setTableColumns(tableColumns);
+
+        List<DmTableColumn> ptableColumns = dmTableColumnService.list(new QueryWrapper<DmTableColumn>()
+                .eq("is_deleted", "0")
+                .eq("table_id", id)
+                .eq("is_partition_col", "1")
+                .orderByAsc("seq"));
+        dmTable.setPartitionColumns(ptableColumns);
+
+        return dmTable;
+
     }
 }
