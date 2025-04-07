@@ -2,6 +2,7 @@ package com.luy.dwm.model.service.impl;
 
 import com.luy.dwm.common.bean.QueryInfo;
 import com.luy.dwm.common.bean.Result;
+import com.luy.dwm.common.util.SqlUtil;
 import com.luy.dwm.model.bean.DmDimension;
 import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.bean.DmTableColumn;
@@ -67,8 +68,8 @@ public class DmTableServiceImpl extends ServiceImpl<DmTableMapper, DmTable> impl
             condition = "and t.model_id" + queryInfo.getModelId();
         }
         if(queryInfo.getTableNameQuery()!=null&&queryInfo.getTableNameQuery().trim().length()>0){
-            condition+="and ( t.table_name like '%"+queryInfo.getTableNameQuery()+"%' " +
-                    "or t.table_name_chn like '%"+queryInfo.getTableNameQuery()+"%' )";
+            condition+="and ( t.table_name like '%"+ SqlUtil.filterUnsafeSql(queryInfo.getTableNameQuery())+"%' " +
+                    "or t.table_name_chn like '%"+SqlUtil.filterUnsafeSql(queryInfo.getTableNameQuery())+"%' )";
         }
         condition+= queryInfo.getLimitSQL();
 

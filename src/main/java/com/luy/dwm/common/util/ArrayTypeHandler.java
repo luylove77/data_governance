@@ -26,7 +26,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Long[]> {
     public Long[] getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String stringValue = rs.getString(columnName);
 
-        if(stringValue != null){
+        if(stringValue != null&&!stringValue.isEmpty()){
             String[] split = stringValue.split(",");
             return Arrays.stream(split).map(Long::valueOf).toArray(Long[]::new);
         }
@@ -38,7 +38,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Long[]> {
     public Long[] getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String stringValue = rs.getString(columnIndex);
 
-        if(stringValue != null){
+        if(stringValue != null&&!stringValue.isEmpty()){
             String[] split = stringValue.split(",");
             return Arrays.stream(split).map(Long::valueOf).toArray(Long[]::new);
         }
@@ -50,7 +50,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Long[]> {
     public Long[] getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String stringValue = cs.getString(columnIndex);
 
-        if(stringValue != null){
+        if(stringValue != null&&!stringValue.isEmpty()){
             String[] split = stringValue.split(",");
             return Arrays.stream(split).map(Long::valueOf).toArray(Long[]::new);
         }
