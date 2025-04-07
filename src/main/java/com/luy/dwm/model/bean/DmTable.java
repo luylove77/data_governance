@@ -8,6 +8,7 @@ import com.luy.dwm.common.util.ArrayTypeHandler;
 import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * æ•°æ�®è¡¨
@@ -175,5 +176,17 @@ public class DmTable implements Serializable {
      * æ˜¯å�¦åˆ é™¤
      */
     private String isDeleted;
+
+    @TableField(exist = false)
+    private List<DmTableColumn> tableColumns;
+
+    @TableField(exist = false)
+    private List<DmTableColumn> partitionColumns;
+
+    @TableField(exist = false)
+    private String modelName;
+
+    @TableField(exist = false)
+    private String tableStatusName;
 
 }

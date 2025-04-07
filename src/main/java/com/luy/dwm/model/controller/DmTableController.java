@@ -6,6 +6,7 @@ import com.luy.dwm.common.bean.Result;
 import com.luy.dwm.model.bean.DmDimension;
 import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.service.DmDimensionService;
+import com.luy.dwm.model.service.DmTableColumnService;
 import com.luy.dwm.model.service.DmTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,25 +30,25 @@ public class DmTableController {
     @Autowired
     DmTableService dmTableService;
 
+    @Autowired
+    DmTableColumnService dmTableColumnService;
+
     @PostMapping("/detail")
     public Result save(@RequestBody DmTable dmTable){
-        dmTable.setLastUpdateTime(new Date());
-        dmTable.setLastUpdateUserId(9999L);
-        dmTableService.saveOrUpdate(dmTable);
-
+        dmTableService.saveTableAll(dmTable);
         return Result.ok(dmTable);
     }
 
-//    @GetMapping("/list")
-//    public Result getList(QueryInfo queryInfo) {
-//
-//
-//        List<DmDimension> list = dmDimensionService.getQueryList(queryInfo);
-//        Integer total = dmDimensionService.getQueryTotal(queryInfo);
-//
-//        //Result专门有封装返回两个参数的
-//        return Result.ok(list, total);
-//    }
+    @GetMapping("/list")
+    public Result getList(QueryInfo queryInfo) {
+
+
+        List<DmTable> list = dmTableService.getQueryList(queryInfo);
+        Integer total = dmTableService.getQueryTotal(queryInfo);
+
+        //Result专门有封装返回两个参数的
+        return Result.ok(list, total);
+    }
 //
 //    @GetMapping("/detail/{id}")
 //    public Result getDetail(@PathVariable("id") Long id) {
