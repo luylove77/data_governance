@@ -55,6 +55,17 @@ public class DmTableController {
         DmTable dmTable = dmTableService.getTableAll(id);
         return Result.ok(dmTable);
     }
+
+    @PostMapping("/hive/{id}")
+    public Result submitToHive(@PathVariable("id") Long tableId) {
+        try {
+            dmTableService.submitToHive(tableId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("Hive建表失败");
+        }
+        return Result.ok();
+    }
 //
 //    @GetMapping("/options")
 //    public Result getOptions(@RequestParam(value = "modelId",required = false) Long modelId){

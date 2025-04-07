@@ -22,4 +22,6 @@ public interface DmTableService extends IService<DmTable> {
     Integer getQueryTotal(QueryInfo queryInfo);
 
     DmTable getTableAll(Long id);
+
+    void submitToHive(Long tableId);
 }

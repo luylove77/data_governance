@@ -1,11 +1,13 @@
 package com.luy.dwm.common.component;
 
+import com.luy.dwm.model.bean.DmTable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -51,6 +53,24 @@ public class TableHiveProcessor {
         hiveMetaClient.createDatabase(database);
     }
 
+
+    public void createTableToHive(DmTable dmTable) throws TException {
+        //springboot与hive交互有Table对象
+        Table table = exTractHiveTableFromDmTable(dmTable);
+        hiveMetaClient.createTable(table);
+    }
+
+    private Table exTractHiveTableFromDmTable(DmTable dmTable) {
+        //1 库名 表名 表类型 owner
+
+        //2 分区字段
+
+        //3 普通字段
+
+        //4 sd相关 输入 输出格式 物理位置 序列化参数
+
+        return null;
+    }
 
 
 }
