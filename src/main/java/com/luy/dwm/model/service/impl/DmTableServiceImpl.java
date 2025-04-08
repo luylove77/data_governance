@@ -2,23 +2,19 @@ package com.luy.dwm.model.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.luy.dwm.common.bean.QueryInfo;
-import com.luy.dwm.common.bean.Result;
 import com.luy.dwm.common.component.TableHiveProcessor;
 import com.luy.dwm.common.util.SqlUtil;
-import com.luy.dwm.model.bean.DmDimension;
 import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.bean.DmTableColumn;
 import com.luy.dwm.model.mapper.DmTableMapper;
 import com.luy.dwm.model.service.DmTableColumnService;
 import com.luy.dwm.model.service.DmTableService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import org.springframework.transaction.annotation.Transactional;
-import shaded.parquet.org.apache.thrift.TException;
-
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -125,7 +121,7 @@ public class DmTableServiceImpl extends ServiceImpl<DmTableMapper, DmTable> impl
     @Override
     public void submitToHive(Long tableId) throws TException {
         //提取dmTable对象
-        DmTable dmTable = getById(tableId);
+        DmTable dmTable = getTableAll(tableId);
         tableHiveProcessor.createTableToHive(dmTable);
 
     }

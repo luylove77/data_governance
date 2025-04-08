@@ -3,6 +3,7 @@ package com.luy.dwm.model.service;
 import com.luy.dwm.common.bean.QueryInfo;
 import com.luy.dwm.model.bean.DmTable;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.thrift.TException;
 
 import java.util.List;
 
@@ -23,5 +24,5 @@ public interface DmTableService extends IService<DmTable> {
 
     DmTable getTableAll(Long id);
 
-    void submitToHive(Long tableId);
+    void submitToHive(Long tableId) throws TException;
 }

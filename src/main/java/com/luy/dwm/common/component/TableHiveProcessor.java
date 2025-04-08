@@ -104,7 +104,7 @@ public class TableHiveProcessor {
 
 
         //5 参数部分 压缩格式 备注
-        storageDescriptor.setParameters(this.getParameters(dmTable));
+        table.setParameters(this.getParameters(dmTable));
 
         table.setSd(storageDescriptor);
 
@@ -118,10 +118,10 @@ public class TableHiveProcessor {
 
         //压缩格式
         if(dmTable.getCompressType().equals(CommonCodes.COMPRESS_TYPE_SNAPPY)&&
-        dmTable.getStorageMode().equals(CommonCodes.STORAGE_FORMAT_ORC)){
+        dmTable.getStorageFormat().equals(CommonCodes.STORAGE_FORMAT_ORC)){
             params.put("orc.compress","snappy");
         }else if(dmTable.getCompressType().equals(CommonCodes.COMPRESS_TYPE_SNAPPY)&&
-                dmTable.getStorageMode().equals(CommonCodes.STORAGE_FORMAT_PARQUET)){
+                dmTable.getStorageFormat().equals(CommonCodes.STORAGE_FORMAT_PARQUET)){
             params.put("parquet.compress","snappy");
         }else if(dmTable.getCompressType().equals(CommonCodes.COMPRESS_TYPE_GZIP)){
             params.put("compression.codec",TableParams.COMPRESS_TYPE_GZIP);
@@ -132,16 +132,18 @@ public class TableHiveProcessor {
 
     private List<FieldSchema> getKeys(List<DmTableColumn> partitionColumns) {
         List fieldList = new ArrayList();
-        for(DmTableColumn partitionColumn:partitionColumns){
-            FieldSchema fieldSchema = new FieldSchema();
-            //英文名
-            fieldSchema.setName(partitionColumn.getColumnName());
-            //中文名
-            fieldSchema.setComment(partitionColumn.getColumnComment());
-            //类型
-            fieldSchema.setType(getHiveDataType(partitionColumn.getDataType()));
+        if(partitionColumns!=null) {
+            for (DmTableColumn partitionColumn : partitionColumns) {
+                FieldSchema fieldSchema = new FieldSchema();
+                //英文名
+                fieldSchema.setName(partitionColumn.getColumnName());
+                //中文名
+                fieldSchema.setComment(partitionColumn.getColumnComment());
+                //类型
+                fieldSchema.setType(getHiveDataType(partitionColumn.getDataType()));
 
-            fieldList.add(fieldSchema);
+                fieldList.add(fieldSchema);
+            }
         }
 
         return fieldList;
