@@ -1,11 +1,16 @@
 package com.luy.dwm.model.service.impl;
 
+import com.luy.dwm.common.bean.QueryInfo;
+import com.luy.dwm.common.util.SqlUtil;
 import com.luy.dwm.model.bean.DmMetric;
+import com.luy.dwm.model.bean.DmModifier;
 import com.luy.dwm.model.mapper.DmMetricMapper;
 import com.luy.dwm.model.service.DmMetricService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.dynamic.datasource.annotation.DS;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,5 +23,28 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 @Service
 @DS("db1")
 public class DmMetricServiceImpl extends ServiceImpl<DmMetricMapper, DmMetric> implements DmMetricService {
+    public List<DmMetric> getQueryList(QueryInfo queryInfo){
+        String condition= "";
+        if(queryInfo.getModelId() !=null){
+            condition +=" and t.model_id="+queryInfo.getModelId();
+        }
 
+        if(queryInfo.getMetricName()!=null&&queryInfo.getMetricName().trim().length()>0){
+            condition+="and t.metric_name like '%"+ SqlUtil.filterUnsafeSql(queryInfo.getMetricName()) +"%' ";
+        }
+        condition += queryInfo.getLimitSQL();
+
+        List<DmMetric> list = this.baseMapper.selectQueryList(condition);
+        return list;
+    }
+
+    @Override
+    public Integer getQueryTotal(QueryInfo queryInfo){
+        String condition= "";
+        if(queryInfo.getModelId() !=null){
+            condition +=" and t.model_id="+queryInfo.getModelId();
+        }
+        Integer total=  this.baseMapper.selectQueryCount(condition);
+        return total;
+    }
 }

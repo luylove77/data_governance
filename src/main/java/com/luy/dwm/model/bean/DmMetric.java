@@ -1,8 +1,10 @@
 package com.luy.dwm.model.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.luy.dwm.common.util.ArrayTypeHandler;
 import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
@@ -67,13 +69,15 @@ public class DmMetric implements Serializable {
     /**
      * ç²’åº¦_ç»´åº¦id
      */
-    private String linkDimIds;
+    @TableField(typeHandler = ArrayTypeHandler.class)
+    private Long[] linkDimIds;
 
 
     /**
      * å…³è�”åŽŸå­�æŒ‡æ ‡
      */
-    private String linkAtomicMetricIds;
+    @TableField(typeHandler = ArrayTypeHandler.class)
+    private Long[] linkAtomicMetricIds;
 
 
     /**
@@ -85,7 +89,8 @@ public class DmMetric implements Serializable {
     /**
      * ä¿®é¥°è¯�id(æ´¾ç”Ÿ)
      */
-    private String linkModifierIds;
+    @TableField(typeHandler = ArrayTypeHandler.class)
+    private Long[] linkModifierIds;
 
 
     /**
@@ -116,5 +121,14 @@ public class DmMetric implements Serializable {
      * æ˜¯å�¦åˆ é™¤
      */
     private String isDeleted;
+
+    @TableField(exist = false)
+    private String modelName;
+
+    @TableField(exist = false)
+    private String domainName;
+
+    @TableField(exist = false)
+    private String metricTypeName;
 
 }

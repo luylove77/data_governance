@@ -1,6 +1,7 @@
 package com.luy.dwm.model.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -68,5 +69,8 @@ public class DmModifier implements Serializable {
      * æ˜¯å�¦åˆ é™¤
      */
     private String isDeleted;
+
+    @TableField(exist = false)
+    private String modelName;
 
 }
