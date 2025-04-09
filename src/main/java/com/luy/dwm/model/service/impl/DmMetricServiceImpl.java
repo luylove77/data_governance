@@ -4,12 +4,14 @@ import com.luy.dwm.common.bean.QueryInfo;
 import com.luy.dwm.common.util.SqlUtil;
 import com.luy.dwm.model.bean.DmMetric;
 import com.luy.dwm.model.bean.DmModifier;
+import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.mapper.DmMetricMapper;
 import com.luy.dwm.model.service.DmMetricService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import com.baomidou.dynamic.datasource.annotation.DS;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,5 +48,21 @@ public class DmMetricServiceImpl extends ServiceImpl<DmMetricMapper, DmMetric> i
         }
         Integer total=  this.baseMapper.selectQueryCount(condition);
         return total;
+    }
+
+    @Override
+    public Object getQueryLinkList(Long tableId) {
+        List<DmMetric> list = this.baseMapper.getQueryLinkList(tableId);
+        return list;
+    }
+
+    @Override
+    public List<DmTable> getMetricLinkTable(Long metricId) {
+        //查询指标Id 关联的tableId tableName
+        DmMetric dmMetric = this.getById(metricId);
+
+        List<DmTable> dmTableList = this.baseMapper.getMetricLinkTable(metricId,dmMetric.getMetricType());
+
+        return dmTableList;
     }
 }

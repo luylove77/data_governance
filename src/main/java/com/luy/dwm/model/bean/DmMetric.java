@@ -8,6 +8,7 @@ import com.luy.dwm.common.util.ArrayTypeHandler;
 import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * æŒ‡æ ‡
@@ -130,5 +131,14 @@ public class DmMetric implements Serializable {
 
     @TableField(exist = false)
     private String metricTypeName;
+
+    @TableField(exist = false)
+    private String columnComment;
+
+    @TableField(exist = false)
+    private String columnName;
+
+    @TableField(exist = false)
+    private List<DmTable> linkTableList;
 
 }

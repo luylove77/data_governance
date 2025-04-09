@@ -6,6 +6,7 @@ import com.luy.dwm.common.bean.Result;
 import com.luy.dwm.model.bean.DmDimension;
 import com.luy.dwm.model.bean.DmMetric;
 import com.luy.dwm.model.bean.DmMetric;
+import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.service.DmMetricService;
 import com.luy.dwm.model.service.DmMetricService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,12 @@ public class DmMetricController {
 
     @GetMapping("/detail/{id}")
     public Result getDetail(@PathVariable("id") Long id){
-        return Result.ok(dmMetricService.getById(id));
+        DmMetric dmMetric = dmMetricService.getById(id);
+        //该指标关联的数据表
+        List<DmTable> linkTableList = dmMetricService.getMetricLinkTable(id);
+        dmMetric.setLinkTableList(linkTableList);
+
+        return Result.ok(dmMetric);
     }
 
     @GetMapping("/options")
@@ -61,6 +67,22 @@ public class DmMetricController {
                 .eq(modelId != null, "model_id", modelId));
 
         return Result.ok(mapList);
+    }
+
+    @GetMapping("/link/{tableId}")
+    public Result getLink(@PathVariable("tableId") Long tableId){
+        return Result.ok(dmMetricService.getQueryLinkList(tableId));
+    }
+    
+    @PostMapping("/link")
+    public Result saveLink(@RequestBody List<DmMetric> dmMetricList){
+        for (DmMetric dmMetric : dmMetricList) {
+            dmMetric.setLastUpdateUserId(9999L);
+            dmMetric.setLastUpdateTime(new Date());
+        }
+        //saveOrUpdateBatch会识别多条,组成一个大的insert去存
+        dmMetricService.saveOrUpdateBatch(dmMetricList);
+        return Result.ok(dmMetricList);
     }
 
 }
