@@ -1,7 +1,16 @@
 package com.luy.dwm.model.controller;
 
+import com.luy.dwm.common.bean.Result;
+import com.luy.dwm.common.component.TableHiveProcessor;
+import com.luy.dwm.model.bean.DmTableSync;
+import com.luy.dwm.model.service.DmTableSyncService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,7 +21,37 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2025-04-09
  */
 @RestController
-@RequestMapping("/model/dmTableSync")
+@RequestMapping("/data-model/sync")
 public class DmTableSyncController {
 
+    @Autowired
+    TableHiveProcessor tableHiveProcessor;
+
+    @Autowired
+    DmTableSyncService dmTableSyncService;
+
+    @GetMapping("/schema/options")
+    public Result getSchemaNameOptions(){
+        List<String> schemaNameList = null;
+        try {
+            schemaNameList = tableHiveProcessor.getDatabaseNameList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("获取hive数据库列表失败");
+        }
+        return Result.ok(schemaNameList);
+    }
+
+    @GetMapping("/list")
+    public Result getSyncList(@RequestParam("schemaName") String schemaName){
+        List<DmTableSync> dmTableSyncList = null;
+        try {
+            dmTableSyncList = dmTableSyncService.getSyncList(schemaName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("获取hive数据表列表失败");
+        }
+
+        return Result.ok(dmTableSyncList);
+    }
 }

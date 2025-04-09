@@ -24,9 +24,9 @@ public interface DmTableMapper extends BaseMapper<DmTable> {
             " left join dp_data_warehouse_model dw on t.model_id = dw.id\n" +
             " left join common_code cc on t.table_status = cc.code_no \n" +
             "where t.is_deleted = '0' ${condition}")
-    List<DmTable> selectList(String condition);
+    List<DmTable> selectQueryList(String condition);
 
     @Select("select count(*) from dm_table t\n" +
             "where t.is_deleted = '0' ${condition}")
-    Integer selectCount(String condition);
+    Integer selectQueryCount(String condition);
 }

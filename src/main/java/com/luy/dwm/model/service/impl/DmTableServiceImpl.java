@@ -75,7 +75,7 @@ public class DmTableServiceImpl extends ServiceImpl<DmTableMapper, DmTable> impl
         }
         condition+= queryInfo.getLimitSQL();
 
-        List<DmTable> list = this.baseMapper.selectList(condition);
+        List<DmTable> list = this.baseMapper.selectQueryList(condition);
 
 
         return list;
@@ -92,7 +92,7 @@ public class DmTableServiceImpl extends ServiceImpl<DmTableMapper, DmTable> impl
                     "or t.table_name_chn like '%"+queryInfo.getTableNameQuery()+"%' )";
         }
 
-        Integer total = this.baseMapper.selectCount(condition);
+        Integer total = this.baseMapper.selectQueryCount(condition);
 
         return total;
     }

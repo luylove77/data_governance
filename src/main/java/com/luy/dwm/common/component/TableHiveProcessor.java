@@ -257,6 +257,14 @@ public class TableHiveProcessor {
     }
 
 
+    public List<String> getDatabaseNameList() throws Exception {
+        List<String> databaseNameList = hiveMetaClient.getAllDatabases();
+        return databaseNameList;
+    }
 
-
+    //获取数据库下的表名
+    public List<String> getTableNameList(String databaseName) throws Exception {
+        List<String> tableNameList = hiveMetaClient.getAllTables(databaseName);
+        return tableNameList;
+    }
 }

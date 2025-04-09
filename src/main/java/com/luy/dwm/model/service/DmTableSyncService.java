@@ -3,6 +3,8 @@ package com.luy.dwm.model.service;
 import com.luy.dwm.model.bean.DmTableSync;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * æ•°æ�®å�Œæ­¥ä¿¡æ�¯è¡¨ 服务类
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface DmTableSyncService extends IService<DmTableSync> {
 
+    List<DmTableSync> getSyncList(String schemaName) throws Exception;
 }
