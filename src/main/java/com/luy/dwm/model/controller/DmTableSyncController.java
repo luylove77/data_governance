@@ -57,7 +57,7 @@ public class DmTableSyncController {
     public Result syncMeta(@RequestBody List<DmTableSync> tableSyncList){
         try {
             dmTableSyncService.syncMeta(tableSyncList);
-        } catch (TException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return Result.error("同步hive元数据失败");
         }
