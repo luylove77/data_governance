@@ -1,19 +1,15 @@
 package com.luy.dwm.model.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.luy.dwm.common.bean.QueryInfo;
 import com.luy.dwm.common.bean.Result;
-import com.luy.dwm.model.bean.DmDimension;
 import com.luy.dwm.model.bean.DmTable;
-import com.luy.dwm.model.service.DmDimensionService;
 import com.luy.dwm.model.service.DmTableColumnService;
 import com.luy.dwm.model.service.DmTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * <p>

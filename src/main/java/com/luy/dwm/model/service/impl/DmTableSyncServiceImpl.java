@@ -10,14 +10,12 @@ import com.luy.dwm.model.service.DmTableSyncService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luy.dwm.plan.bean.DpDataWarehouseModel;
 import com.luy.dwm.plan.service.DpDataWarehouseModelService;
+import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.dynamic.datasource.annotation.DS;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -95,5 +93,35 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
         }
 
         return dmTableSyncListForShow;
+    }
+
+    @Override
+    public void syncMeta(List<DmTableSync> tableSyncList) throws TException {
+       List<Long> tableIdList = tableSyncList.stream().filter(dmTableSync -> dmTableSync.getTableId() != null)
+                       .map(dmTableSync -> dmTableSync.getTableId()).collect(Collectors.toList());
+
+        Map<Long, DmTable> dmTableMap = new HashMap<>();
+
+       if (tableIdList.size() > 0){
+           List<DmTable> dmTableList = dmTableService.list(new QueryWrapper<DmTable>().in("id", tableIdList));
+           //把dmTableList转为map 用tableId作为key 方便后续使用
+           dmTableMap = dmTableList.stream().collect(Collectors.toMap(dmTable -> dmTable.getId(), dmTable -> dmTable));
+       }
+
+
+        for (DmTableSync dmTableSync : tableSyncList) {
+            DmTable dmTable=null;
+            if (dmTableSync.getTableId() != null) {
+                dmTable = dmTableMap.get(dmTableSync.getTableId());
+            }else {
+                dmTable = new DmTable();
+            }
+            tableHiveProcessor.syncTableMeta(dmTable);
+
+            System.out.println("dmTable = " + dmTable);
+
+        }
+
+
     }
 }

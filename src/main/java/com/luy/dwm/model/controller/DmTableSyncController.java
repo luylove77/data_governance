@@ -4,11 +4,9 @@ import com.luy.dwm.common.bean.Result;
 import com.luy.dwm.common.component.TableHiveProcessor;
 import com.luy.dwm.model.bean.DmTableSync;
 import com.luy.dwm.model.service.DmTableSyncService;
+import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -53,5 +51,16 @@ public class DmTableSyncController {
         }
 
         return Result.ok(dmTableSyncList);
+    }
+
+    @PostMapping("/meta")
+    public Result syncMeta(@RequestBody List<DmTableSync> tableSyncList){
+        try {
+            dmTableSyncService.syncMeta(tableSyncList);
+        } catch (TException e) {
+            e.printStackTrace();
+            return Result.error("同步hive元数据失败");
+        }
+        return Result.ok();
     }
 }

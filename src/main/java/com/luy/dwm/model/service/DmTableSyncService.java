@@ -2,6 +2,7 @@ package com.luy.dwm.model.service;
 
 import com.luy.dwm.model.bean.DmTableSync;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.thrift.TException;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ import java.util.List;
 public interface DmTableSyncService extends IService<DmTableSync> {
 
     List<DmTableSync> getSyncList(String schemaName) throws Exception;
+
+    void syncMeta(List<DmTableSync> tableSyncList) throws TException;
 }

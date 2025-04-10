@@ -267,4 +267,143 @@ public class TableHiveProcessor {
         List<String> tableNameList = hiveMetaClient.getAllTables(databaseName);
         return tableNameList;
     }
+
+    //从hive中提取表的元数据，同步到dmTable
+    public void syncTableMeta(DmTable dmTable) throws TException {
+        //1 从hive中提取表的元数据 table
+        Table table = hiveMetaClient.getTable(dmTable.getSchemaName(),dmTable.getTableName());
+
+        //2 从table中获取表的元数据，赋值给dmTable
+        //提取 参数信息 包括压缩方式和表备注
+        dmTable.setCompressType(getCompressTypeFromHive(table));
+        dmTable.setTableNameChn(getTableCommentFromHive(table));
+
+        // 分区字段
+        dmTable.setPartitionColumns(getColumnsFromHive(table.getPartitionKeys(),true));
+
+        // 普通字段
+        dmTable.setTableColumns(getColumnsFromHive(table.getSd().getCols(),false));
+
+        // 输入输出格式
+        dmTable.setStorageFormat(parseStorageFormat(table.getSd()));
+
+        // 空值替换
+        dmTable.setNullDefined(getNullDefined(table.getSd()));
+
+        // 层级
+        dmTable.setDwLevel(getDmLevel(table.getTableName()));
+
+        // 还可以通过表名的信息 推断出 存储策略 统计周期 数据域 业务过程 维度
+        // 不准也可以让用户页面自己填
+
+
+    }
+
+    // 根据表名的前缀来判断表的层级
+    private String getDmLevel(String tableName) {
+        if(tableName.startsWith("ods_")){
+            return CommonCodes.DW_LEVEL_ODS;
+        } else if (tableName.startsWith("dwd_")){
+            return CommonCodes.DW_LEVEL_DWD;
+        } else if (tableName.startsWith("dws_")){
+            return CommonCodes.DW_LEVEL_DWS;
+        } else if (tableName.startsWith("dim_")){
+            return CommonCodes.DW_LEVEL_DIM;
+        } else if (tableName.startsWith("ads_")){
+            return CommonCodes.DW_LEVEL_ADS;
+        }
+        return null;
+    }
+
+    private String getNullDefined(StorageDescriptor sd) {
+        if (sd.getSerdeInfo().getParameters().containsKey("serialization.null.format")) {
+            String nullString = sd.getSerdeInfo().getParameters().get("serialization.null.format");
+            if(nullString.equals("")){
+                return "''";
+            }
+            return nullString;
+        }
+        return null;
+    }
+
+    // 辅助方法: 解析存储格式
+    private String parseStorageFormat(StorageDescriptor sd) {
+        if (sd.getInputFormat().equals(TableParams.PARQUET_INPUT_FORMAT)){
+            return CommonCodes.STORAGE_FORMAT_PARQUET;
+        } else if (sd.getInputFormat().equals(TableParams.ORC_INPUT_FORMAT)){
+            return CommonCodes.STORAGE_FORMAT_ORC;
+        }  else if (sd.getInputFormat().equals(TableParams.TEXT_INPUT_FORMAT)){
+            if (sd.getSerdeInfo().getSerializationLib().equals(TableParams.SERDE_CLASS_JSON)){
+                return CommonCodes.STORAGE_FORMAT_TEXT_JSON;
+            } else {
+                return CommonCodes.STORAGE_FORMAT_TEXT_TAB;
+            }
+        }
+        return null;
+    }
+
+    private List<DmTableColumn> getColumnsFromHive(List<FieldSchema> fieldSchemaList,boolean isPartitionCol) {
+
+        if(fieldSchemaList!=null && fieldSchemaList.size()>0){
+            List<DmTableColumn> dmTableColumnList = new ArrayList<>();
+            for (FieldSchema fieldSchema : fieldSchemaList) {
+                DmTableColumn dmTableColumn = new DmTableColumn();
+                dmTableColumn.setColumnName(fieldSchema.getName());
+                dmTableColumn.setDataType(this.getDataTypeCodeByHiveDataType(fieldSchema.getType()));
+                dmTableColumn.setColumnComment(fieldSchema.getComment());
+                dmTableColumn.setIsPartitionCol(isPartitionCol?"1":"0");
+                dmTableColumnList.add(dmTableColumn);
+            }
+            return dmTableColumnList;
+        }
+       return null;
+    }
+
+    private String getDataTypeCodeByHiveDataType(String type) {
+        switch (type){
+            case "string":
+                return CommonCodes.DATA_TYPE_STRING;
+            case "decimal":
+                return CommonCodes.DATA_TYPE_DECIMAL;
+            case "bigint":
+                return CommonCodes.DATA_TYPE_BIGINT;
+            case "decimal(16,2)":
+                return CommonCodes.DATA_TYPE_DECIMAL_16_2;
+        }
+        return CommonCodes.DATA_TYPE_STRING;
+    }
+
+    private String getTableCommentFromHive(Table table) {
+        Map<String, String> parameters = table.getParameters();
+        if(parameters!=null){
+            String comment = parameters.get("comment");
+            return comment;
+        }
+        return null;
+    }
+
+
+    private String getCompressTypeFromHive(Table table) {
+        // 1 gzip
+        Map<String, String> parameters = table.getParameters();
+        if(parameters.containsKey("compression.codec")){
+            String compressCodec = parameters.get("compression.codec");
+            if(compressCodec.toLowerCase().contains("gzip")){
+                return CommonCodes.COMPRESS_TYPE_GZIP;
+            }
+            // 2 snappy
+        } else if(parameters.containsKey("orc.compress")||parameters.containsKey("parquet.compress")){
+            String compressCodec = parameters.get("orc.compress");
+            if(compressCodec==null){
+                compressCodec = parameters.get("parquet.compress");
+            }
+            if(compressCodec.toLowerCase().contains("snappy")){
+                return CommonCodes.COMPRESS_TYPE_SNAPPY;
+            }
+
+        }
+        return CommonCodes.COMPRESS_TYPE_NONE;
+
+
+    }
 }
