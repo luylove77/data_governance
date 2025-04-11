@@ -100,7 +100,7 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
        List<Long> tableIdList = tableSyncList.stream().filter(dmTableSync -> dmTableSync.getTableId() != null)
                        .map(dmTableSync -> dmTableSync.getTableId()).collect(Collectors.toList());
 
-        Map<Long, DmTable> dmTableMap = new HashMap<>();
+       Map<Long, DmTable> dmTableMap = new HashMap<>();
 
        if (tableIdList.size() > 0){
            List<DmTable> dmTableList = dmTableService.list(new QueryWrapper<DmTable>().in("id", tableIdList));
@@ -115,6 +115,8 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
                 dmTable = dmTableMap.get(dmTableSync.getTableId());
             }else {
                 dmTable = new DmTable();
+                dmTable.setSchemaName(dmTableSync.getSchemaName());
+                dmTable.setTableName(dmTableSync.getTableName());
             }
             tableHiveProcessor.syncTableMeta(dmTable);
 
