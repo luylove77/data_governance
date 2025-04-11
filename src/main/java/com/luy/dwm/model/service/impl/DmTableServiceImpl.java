@@ -1,6 +1,7 @@
 package com.luy.dwm.model.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.luy.dwm.common.bean.QueryInfo;
 import com.luy.dwm.common.component.TableHiveProcessor;
 import com.luy.dwm.common.util.SqlUtil;
@@ -17,6 +18,7 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -42,24 +44,43 @@ public class DmTableServiceImpl extends ServiceImpl<DmTableMapper, DmTable> impl
         dmTable.setLastUpdateUserId(9999L);
         this.saveOrUpdate(dmTable);
         int seq=1;
-        for(DmTableColumn tableColumn:dmTable.getTableColumns()){
-          tableColumn.setTableId(dmTable.getId());
-          tableColumn.setSeq(seq++);
-          tableColumn.setIsPartitionCol("0");
-          tableColumn.setLastUpdateTime(new Date());
-          tableColumn.setLastUpdateUserId(9999L);
-        }
-        seq=1;
-        for(DmTableColumn partitionColumn:dmTable.getPartitionColumns()){
-            partitionColumn.setTableId(dmTable.getId());
-            partitionColumn.setSeq(seq++);
-            partitionColumn.setIsPartitionCol("1");
-            partitionColumn.setLastUpdateTime(new Date());
-            partitionColumn.setLastUpdateUserId(9999L);
+        if(dmTable.getTableColumns()!=null){
+            for(DmTableColumn tableColumn:dmTable.getTableColumns()){
+                tableColumn.setTableId(dmTable.getId());
+                tableColumn.setSeq(seq++);
+                tableColumn.setIsPartitionCol("0");
+                tableColumn.setLastUpdateTime(new Date());
+                tableColumn.setLastUpdateUserId(9999L);
+            }
         }
 
+        seq=1;
+        if(dmTable.getPartitionColumns()!=null){
+            for(DmTableColumn partitionColumn:dmTable.getPartitionColumns()){
+                partitionColumn.setTableId(dmTable.getId());
+                partitionColumn.setSeq(seq++);
+                partitionColumn.setIsPartitionCol("1");
+                partitionColumn.setLastUpdateTime(new Date());
+                partitionColumn.setLastUpdateUserId(9999L);
+            }
+        }
+        // saveOrUpdateBatch只能新增或者修改，不能删除，所以删除的字段要先删除
         dmTableColumnService.saveOrUpdateBatch(dmTable.getTableColumns());
         dmTableColumnService.saveOrUpdateBatch(dmTable.getPartitionColumns());
+
+        // 清理掉已经删除的字段
+        List<Long> colsIdList = dmTable.getTableColumns().stream().map(dmTableColumn -> dmTableColumn.getId()).collect(Collectors.toList());
+
+        // 可能没分区
+        if(dmTable.getPartitionColumns()!=null) {
+            List<Long> partColsIdList = dmTable.getPartitionColumns().stream().map(dmTableColumn -> dmTableColumn.getId()).collect(Collectors.toList());
+            colsIdList.addAll(partColsIdList);
+        }
+
+        UpdateWrapper<DmTableColumn> updateWrapper = new UpdateWrapper<DmTableColumn>().set("is_deleted", "1")
+                .eq("table_id", dmTable.getId())
+                .notIn("id", colsIdList);
+        dmTableColumnService.update(updateWrapper);
 
     }
 

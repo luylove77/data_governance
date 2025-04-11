@@ -2,6 +2,7 @@ package com.luy.dwm.model.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.luy.dwm.common.component.TableHiveProcessor;
+import com.luy.dwm.common.constants.CommonCodes;
 import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.bean.DmTableSync;
 import com.luy.dwm.model.mapper.DmTableSyncMapper;
@@ -71,19 +72,16 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
                 if (dmTableMap.containsKey(tableName)) {
                     // 5 2 1 如果有建模表，查询建模表的schema_name
                     DmTable dmTable = dmTableMap.get(tableName);
-                    if (dmTable != null){
-                        dmTableSync.setModelId(dmTable.getModelId());
-                        dmTableSync.setSchemaName(dmTable.getSchemaName());
-                        dmTableSync.setTableId(dmTable.getId());
-                        dmTableSync.setTableName(dmTable.getTableName());
+                    dmTableSync.setModelId(dmTable.getModelId());
+                    dmTableSync.setSchemaName(dmTable.getSchemaName());
+                    dmTableSync.setTableId(dmTable.getId());
+                    dmTableSync.setTableName(dmTable.getTableName());
+                }else {
+                    // 5 3 如果建模表没有查询到，查询是否有同名的数仓模型
+                    DpDataWarehouseModel model = modelMap.get(schemaName);
+                    if (model != null){
+                        dmTableSync.setModelId(model.getId());
 
-                    }else {
-                        // 5 3 如果建模表没有查询到，查询是否有同名的数仓模型
-                        DpDataWarehouseModel model = modelMap.get(schemaName);
-                        if (model != null){
-                            dmTableSync.setModelId(model.getId());
-
-                        }
                     }
                 }
             }
@@ -109,6 +107,7 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
        }
 
 
+       // 每一次表保存是独立事件，所以用循环
         for (DmTableSync dmTableSync : tableSyncList) {
             DmTable dmTable=null;
             if (dmTableSync.getTableId() != null) {
@@ -117,10 +116,23 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
                 dmTable = new DmTable();
                 dmTable.setSchemaName(dmTableSync.getSchemaName());
                 dmTable.setTableName(dmTableSync.getTableName());
+                dmTable.setModelId(dmTableSync.getModelId());
             }
+            //2 同步hive元数据
             tableHiveProcessor.syncTableMeta(dmTable);
 
             System.out.println("dmTable = " + dmTable);
+
+            //3 保存dmTable建模表, saveTableAll有保存字段
+            dmTable.setTableStatus(CommonCodes.TABLE_STATUS_ADDED);
+            dmTableService.saveTableAll(dmTable);
+
+            //4 保存对应的同步信息
+            dmTableSync.setTableId(dmTable.getId());
+            dmTableSync.setLastSyncMetaTime(new Date());
+            dmTableSync.setLastSyncMetaUserId(9999L);
+            //赋值完要存一下
+            this.saveOrUpdate(dmTableSync);
 
         }
 
