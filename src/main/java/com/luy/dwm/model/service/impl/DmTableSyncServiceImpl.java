@@ -213,6 +213,10 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
             dmTableDataInfo.setLastSyncInfoTime(new Date());
 
             // 保存数据信息
+            dmTableDataInfoService.remove(new QueryWrapper<DmTableDataInfo>()
+                    .eq("table_name",dmTableDataInfo.getTableName())
+                    .eq("schema_name",dmTableDataInfo.getSchemaName()));
+
             dmTableDataInfoService.saveOrUpdate(dmTableDataInfo);
 
             // 保存同步信息
