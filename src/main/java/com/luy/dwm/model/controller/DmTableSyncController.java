@@ -63,4 +63,15 @@ public class DmTableSyncController {
         }
         return Result.ok();
     }
+
+    @PostMapping("/datainfo")
+    public Result syncDataInfo(@RequestBody List<DmTableSync> tableSyncList) {
+        try {
+            dmTableSyncService.syncDataInfo(tableSyncList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("同步hive统计信息失败");
+        }
+        return Result.ok();
+    }
 }

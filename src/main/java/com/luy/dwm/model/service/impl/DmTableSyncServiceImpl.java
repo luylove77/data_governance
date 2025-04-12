@@ -3,6 +3,7 @@ package com.luy.dwm.model.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.luy.dwm.common.component.TableHiveProcessor;
 import com.luy.dwm.common.constants.CommonCodes;
+import com.luy.dwm.common.mapper.HiveMapper;
 import com.luy.dwm.model.bean.DmTable;
 import com.luy.dwm.model.bean.DmTableSync;
 import com.luy.dwm.model.mapper.DmTableSyncMapper;
@@ -39,6 +40,9 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
 
     @Autowired
     DpDataWarehouseModelService dpDataWarehouseModelService;
+
+    @Autowired
+    HiveMapper hiveMapper;
 
     @Override
     public List<DmTableSync> getSyncList(String schemaName) throws Exception {
@@ -137,5 +141,15 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
         }
 
 
+    }
+
+    @Override
+    public void syncDataInfo(List<DmTableSync> tableSyncList) {
+        for (DmTableSync dmTableSync : tableSyncList) {
+            hiveMapper.analyzeTable(dmTableSync.getSchemaName(),dmTableSync.getTableName());
+            List<Map<String, Object>> tableFormattedInfo = hiveMapper.getTableFormattedInfo(dmTableSync.getSchemaName(), dmTableSync.getTableName());
+
+            System.out.println(tableFormattedInfo);
+        }
     }
 }
