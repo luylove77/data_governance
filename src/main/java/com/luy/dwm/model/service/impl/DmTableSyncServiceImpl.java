@@ -210,6 +210,7 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
             dmTableDataInfo.setTableId(dmTableSync.getTableId());
             dmTableDataInfo.setTableName(dmTableSync.getTableName());
             dmTableDataInfo.setSchemaName(dmTableSync.getSchemaName());
+            dmTableDataInfo.setLastSyncInfoTime(new Date());
 
             // 保存数据信息
             dmTableDataInfoService.saveOrUpdate(dmTableDataInfo);
