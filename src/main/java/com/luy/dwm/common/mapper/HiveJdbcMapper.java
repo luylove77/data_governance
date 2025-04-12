@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Mapper
 @DS("db2")
-public interface HiveMapper {
+public interface HiveJdbcMapper {
 
     //执行hive统计
     @Insert("analyze table ${schemaName}.${tableName} compute statistics")
