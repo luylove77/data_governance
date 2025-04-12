@@ -5,8 +5,10 @@ import com.luy.dwm.common.component.TableHiveProcessor;
 import com.luy.dwm.common.constants.CommonCodes;
 import com.luy.dwm.common.mapper.HiveJdbcMapper;
 import com.luy.dwm.model.bean.DmTable;
+import com.luy.dwm.model.bean.DmTableDataInfo;
 import com.luy.dwm.model.bean.DmTableSync;
 import com.luy.dwm.model.mapper.DmTableSyncMapper;
+import com.luy.dwm.model.service.DmTableDataInfoService;
 import com.luy.dwm.model.service.DmTableService;
 import com.luy.dwm.model.service.DmTableSyncService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.dynamic.datasource.annotation.DS;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +46,11 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
 
     @Autowired
     HiveJdbcMapper hiveJdbcMapper;
+
+    @Autowired
+    DmTableDataInfoService dmTableDataInfoService;
+
+
 
     @Override
     public List<DmTableSync> getSyncList(String schemaName) throws Exception {
@@ -143,13 +151,73 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
 
     }
 
+    /**
+     *  tableFormattedInfo变量 里面存的数据
+     *       data_type    comment col_name
+     * 第一行 data_type    comment col_name
+     *       string       活动id   id
+     *       ...
+     *       numFiles      1
+     *       numPartitions 2
+     *       numRows       4
+     *       rawDataSize   443
+     *       totalSize     12
+     */
+
     @Override
     public void syncDataInfo(List<DmTableSync> tableSyncList) {
         for (DmTableSync dmTableSync : tableSyncList) {
+            //强制统计数据信息
             hiveJdbcMapper.analyzeTable(dmTableSync.getSchemaName(),dmTableSync.getTableName());
-            List<Map<String, Object>> tableFormattedInfo = hiveJdbcMapper.getTableFormattedInfo(dmTableSync.getSchemaName(), dmTableSync.getTableName());
+            DmTableDataInfo dmTableDataInfo = new DmTableDataInfo();
+            //提取统计信息
+            List<Map<String, Object>> tableFormattedInfoList = hiveJdbcMapper.getTableFormattedInfo(dmTableSync.getSchemaName(), dmTableSync.getTableName());
 
-            System.out.println("tableFormattedInfo" + tableFormattedInfo);
+            // 遍历tableFormattedInfoList
+            for (Map<String, Object> formatMap : tableFormattedInfoList) {
+                if (formatMap.get("data_type")==null){
+                    // 如果为空则跳过
+                    continue;
+                }
+                String dataType = formatMap.get("data_type").toString().trim();
+                if (dataType.equals("numFiles")) { //文件大小
+                    String numFiles = formatMap.get("comment").toString().trim();
+                    dmTableDataInfo.setNumFiles(Long.valueOf(numFiles));
+                } else if (dataType.equals("numPartitions")) {
+                    String numPartitions = formatMap.get("comment").toString().trim();
+                    dmTableDataInfo.setNumPartitions(Long.valueOf(numPartitions));
+                } else if (dataType.equals("rawDataSize")) {
+                    String rawDataSize = formatMap.get("comment").toString().trim();
+                    dmTableDataInfo.setRawDataSize(Long.valueOf(rawDataSize));
+                } else if (dataType.equals("numRows")) {
+                    String numRows = formatMap.get("comment").toString().trim();
+                    dmTableDataInfo.setNumRows(Long.valueOf(numRows));
+                } else if (dataType.equals("totalSize")) {
+                    String totalSize = formatMap.get("comment").toString().trim();
+                    dmTableDataInfo.setDataSize(Long.valueOf(totalSize));
+                }
+
+            }
+
+            // 计算 压缩比 , 4舍5入, bigdecimal不会丢精度, double会丢精度
+            // 压缩比 = 数据大小 / 原始数据大小
+            dmTableDataInfo.setCompressRatio(BigDecimal.valueOf(dmTableDataInfo.getDataSize()).divide(BigDecimal.valueOf(dmTableDataInfo.getRawDataSize()),2,BigDecimal.ROUND_HALF_UP));
+
+            // 计算 文件平均大小
+            // 文件平均大小 = 数据大小 / 文件数量 , 单位字节很小了不需要保留小数
+            dmTableDataInfo.setFileSizeAvg(BigDecimal.valueOf(dmTableDataInfo.getDataSize()).divide(BigDecimal.valueOf(dmTableDataInfo.getNumFiles()),2,BigDecimal.ROUND_HALF_UP).longValue());
+
+            dmTableDataInfo.setTableId(dmTableSync.getTableId());
+            dmTableDataInfo.setTableName(dmTableSync.getTableName());
+            dmTableDataInfo.setSchemaName(dmTableSync.getSchemaName());
+
+            // 保存数据信息
+            dmTableDataInfoService.saveOrUpdate(dmTableDataInfo);
+
+            // 保存同步信息
+            dmTableSync.setLastSyncInfoTime(new Date());
+            this.saveOrUpdate(dmTableSync);
+
         }
     }
 }

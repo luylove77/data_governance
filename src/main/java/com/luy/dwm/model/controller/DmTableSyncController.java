@@ -61,7 +61,7 @@ public class DmTableSyncController {
             e.printStackTrace();
             return Result.error("同步hive元数据失败");
         }
-        return Result.ok();
+        return Result.ok(tableSyncList);
     }
 
     @PostMapping("/datainfo")
