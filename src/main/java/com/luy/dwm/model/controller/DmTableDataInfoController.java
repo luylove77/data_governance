@@ -1,7 +1,12 @@
 package com.luy.dwm.model.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.luy.dwm.common.bean.Result;
+import com.luy.dwm.model.bean.DmTable;
+import com.luy.dwm.model.bean.DmTableDataInfo;
+import com.luy.dwm.model.service.DmTableDataInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -12,7 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2025-04-09
  */
 @RestController
-@RequestMapping("/model/dmTableDataInfo")
+@RequestMapping("/data-model/datainfo")
 public class DmTableDataInfoController {
+
+    @Autowired
+    DmTableDataInfoService dmTableDataInfoService;
+
+    @GetMapping("/detail/{tableId}")
+    public Result getDetail(@PathVariable("tableId") Long tableId){
+        DmTableDataInfo tableDataInfo = dmTableDataInfoService.getOne(new QueryWrapper<DmTableDataInfo>()
+                .eq("table_id", tableId));
+
+        return Result.ok(tableDataInfo);
+    }
 
 }

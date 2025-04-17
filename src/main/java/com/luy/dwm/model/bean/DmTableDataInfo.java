@@ -92,7 +92,7 @@ public class DmTableDataInfo implements Serializable {
     /**
      * æ•°æ�®å¤§å°�(å­—èŠ‚)å�«å‰¯æœ¬æ•°
      */
-    private Long dataSizeAllRep;
+    private Long dataSizeAllRep = 0L;
 
 
     /**

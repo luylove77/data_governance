@@ -268,6 +268,12 @@ public class TableHiveProcessor {
         return tableNameList;
     }
 
+    //根据库名和表名获得table对象
+    public Table getTable(String databaseName,String tableName) throws Exception {
+        Table table = hiveMetaClient.getTable(databaseName,tableName);
+        return table;
+    }
+
     //从hive中提取表的元数据，同步到dmTable
     public void syncTableMeta(DmTable dmTable) throws TException {
         //1 从hive中提取表的元数据 table
@@ -406,4 +412,5 @@ public class TableHiveProcessor {
 
 
     }
+
 }

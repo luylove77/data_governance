@@ -1,6 +1,7 @@
 package com.luy.dwm.model.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.luy.dwm.common.component.TableHdfsProcessor;
 import com.luy.dwm.common.component.TableHiveProcessor;
 import com.luy.dwm.common.constants.CommonCodes;
 import com.luy.dwm.common.mapper.HiveJdbcMapper;
@@ -14,6 +15,7 @@ import com.luy.dwm.model.service.DmTableSyncService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luy.dwm.plan.bean.DpDataWarehouseModel;
 import com.luy.dwm.plan.service.DpDataWarehouseModelService;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,9 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
 
     @Autowired
     DmTableDataInfoService dmTableDataInfoService;
+
+    @Autowired
+    TableHdfsProcessor tableHdfsProcessor;
 
 
 
@@ -165,7 +170,7 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
      */
 
     @Override
-    public void syncDataInfo(List<DmTableSync> tableSyncList) {
+    public void syncDataInfo(List<DmTableSync> tableSyncList) throws Exception {
         for (DmTableSync dmTableSync : tableSyncList) {
             //强制统计数据信息
             hiveJdbcMapper.analyzeTable(dmTableSync.getSchemaName(),dmTableSync.getTableName());
@@ -211,6 +216,11 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
             dmTableDataInfo.setTableName(dmTableSync.getTableName());
             dmTableDataInfo.setSchemaName(dmTableSync.getSchemaName());
             dmTableDataInfo.setLastSyncInfoTime(new Date());
+
+
+            //获得hdfs的相关信息，包括副本大小，最后访问时间，最后修改时间
+            Table table = tableHiveProcessor.getTable(dmTableSync.getSchemaName(), dmTableSync.getTableName());
+            tableHdfsProcessor.getHdfsFileInfo(table,dmTableDataInfo);
 
             // 保存数据信息
             dmTableDataInfoService.remove(new QueryWrapper<DmTableDataInfo>()
