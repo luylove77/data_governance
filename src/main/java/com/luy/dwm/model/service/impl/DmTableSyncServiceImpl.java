@@ -206,11 +206,15 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
 
             // 计算 压缩比 , 4舍5入, bigdecimal不会丢精度, double会丢精度
             // 压缩比 = 数据大小 / 原始数据大小
-            dmTableDataInfo.setCompressRatio(BigDecimal.valueOf(dmTableDataInfo.getDataSize()).divide(BigDecimal.valueOf(dmTableDataInfo.getRawDataSize()),2,BigDecimal.ROUND_HALF_UP));
+            if(dmTableDataInfo.getRawDataSize()!=null&&dmTableDataInfo.getRawDataSize()!=0L){
+                dmTableDataInfo.setCompressRatio(BigDecimal.valueOf(dmTableDataInfo.getDataSize()).divide(BigDecimal.valueOf(dmTableDataInfo.getRawDataSize()),2,BigDecimal.ROUND_HALF_UP));
+            }
 
             // 计算 文件平均大小
             // 文件平均大小 = 数据大小 / 文件数量 , 单位字节很小了不需要保留小数
-            dmTableDataInfo.setFileSizeAvg(BigDecimal.valueOf(dmTableDataInfo.getDataSize()).divide(BigDecimal.valueOf(dmTableDataInfo.getNumFiles()),2,BigDecimal.ROUND_HALF_UP).longValue());
+            if(dmTableDataInfo.getNumFiles()!=null&&dmTableDataInfo.getNumFiles()!=0L){
+                dmTableDataInfo.setFileSizeAvg(BigDecimal.valueOf(dmTableDataInfo.getDataSize()).divide(BigDecimal.valueOf(dmTableDataInfo.getNumFiles()),2,BigDecimal.ROUND_HALF_UP).longValue());
+            }
 
             dmTableDataInfo.setTableId(dmTableSync.getTableId());
             dmTableDataInfo.setTableName(dmTableSync.getTableName());
@@ -234,5 +238,12 @@ public class DmTableSyncServiceImpl extends ServiceImpl<DmTableSyncMapper, DmTab
             this.saveOrUpdate(dmTableSync);
 
         }
+    }
+
+    public void syncDataInfoForScheduler() throws Exception {
+        //1 查询出需要同步信息的列表，勾上的
+        List<DmTableSync> dmTableSyncList = this.list(new QueryWrapper<DmTableSync>().eq("is_sync_info", "1"));
+        //2 遍历该列表，逐个同步信息
+        syncDataInfo(dmTableSyncList);
     }
 }

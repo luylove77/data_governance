@@ -53,6 +53,14 @@ public class DmTableSyncController {
         return Result.ok(dmTableSyncList);
     }
 
+    //保存同步信息列表
+    @PostMapping("/list")
+    public Result saveSyncList(@RequestBody List<DmTableSync> tableSyncList){
+        dmTableSyncService.saveOrUpdateBatch(tableSyncList);
+        return Result.ok(tableSyncList);
+
+    }
+
     @PostMapping("/meta")
     public Result syncMeta(@RequestBody List<DmTableSync> tableSyncList){
         try {
@@ -74,4 +82,6 @@ public class DmTableSyncController {
         }
         return Result.ok();
     }
+
+
 }

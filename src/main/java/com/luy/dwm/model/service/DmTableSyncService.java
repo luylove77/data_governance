@@ -21,4 +21,6 @@ public interface DmTableSyncService extends IService<DmTableSync> {
     void syncMeta(List<DmTableSync> tableSyncList) throws Exception;
 
     void syncDataInfo(List<DmTableSync> tableSyncList) throws Exception;
+
+    public void syncDataInfoForScheduler() throws Exception;
 }
